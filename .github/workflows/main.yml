@@ -1,0 +1,26 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main   # Trigger this workflow only on pushes to the 'main' branch
+  workflow_dispatch:   # Allow manual triggering of this workflow
+
+jobs:
+  deploy:   # The name of the job
+    runs-on: ubuntu-latest  # GitHub runner (virtual machine)
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Deploy files to the server using Easingthemes
+      - name: Deploy Files to Server
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key
+          REMOTE_HOST: ${{ secrets.VPS_HOST }}            # Server IP or domain
+          REMOTE_USER: ${{ secrets.VPS_USER }}            # SSH user (e.g., 'ubuntu')
+          SOURCE: "."                                     # Source directory
+          TARGET: "/var/www/html"                         # Destination directory
