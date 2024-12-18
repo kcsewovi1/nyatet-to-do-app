@@ -20,7 +20,7 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key
-          REMOTE_HOST: ${{ secrets.VPS_HOST }}            # Server IP or domain
-          REMOTE_USER: ${{ secrets.VPS_USER }}            # SSH user (e.g., 'ubuntu')
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}            # Server IP or domain
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}            # SSH user (e.g., 'ubuntu')
           SOURCE: "."                                     # Source directory
           TARGET: "/var/www/html"                         # Destination directory
