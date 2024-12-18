@@ -7,7 +7,7 @@ on:
   workflow_dispatch:   # Allow manual triggering of this workflow
 
 jobs:
-  deploy:   # The name of the job
+  deploy:
     runs-on: ubuntu-latest  # GitHub runner (virtual machine)
 
     steps:
@@ -15,12 +15,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Deploy files to the server using Easingthemes
-      - name: Deploy Files to Server
-        uses: easingthemes/ssh-deploy@v2.1.5
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}            # Server IP or domain
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}            # SSH user (e.g., 'ubuntu')
-          SOURCE: "."                                     # Source directory
-          TARGET: "/var/www/html"                         # Destination directory
+      # Step 2: Deploy files and prepare directory
+      - name: Deploy Files and Prepare Directory
+        uses: easingthemes/ssh-deploy@v5.1.0
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          SOURCE: "."
+          TARGET: "/var/www/html"
+          SCRIPT_BEFORE: |
+            sudo chown -R ubuntu:ubuntu /var/www/html
+          SCRIPT_AFTER: |
+            mv /var/www/html/.env.example /var/www/html/.env
