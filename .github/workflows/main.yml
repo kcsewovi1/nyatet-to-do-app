@@ -37,4 +37,4 @@ jobs:
 
       # Step 4: Validate Deployment
       - name: Validate Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.REMOTE_HOST }} "ls -la /var/www/html"
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.REMOTE_HOST }} "ls -la /var/www/html"
