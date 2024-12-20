@@ -33,6 +33,7 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: "/var/www/html"
           SCRIPT_BEFORE: |
+            ls
             sudo chown -R ubuntu:ubuntu /var/www/html
           SCRIPT_AFTER: |
             mv /var/www/html/.env.example /var/www/html/.env
