@@ -17,7 +17,9 @@ jobs:
 
       # Step 2: Add Host Key to Known Hosts
       - name: Add Host Key
-        run: ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
       # Step 3: Deploy files to the server and prepare directory
       - name: Deploy Files and Prepare Directory
