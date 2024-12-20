@@ -35,6 +35,4 @@ jobs:
           SCRIPT_AFTER: |
             mv /var/www/html/.env.example /var/www/html/.env
 
-      # Step 4: Validate Deployment
-      - name: Validate Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.REMOTE_HOST }} "ls -la /var/www/html"
+     
