@@ -3,8 +3,8 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main   # Trigger this workflow only on pushes to the 'main' branch
-  workflow_dispatch:   # Allow manual triggering of this workflow
+      - main  # Trigger this workflow only on pushes to the 'main' branch
+  workflow_dispatch:  # Allow manual triggering of this workflow
 
 jobs:
   deploy:
@@ -15,7 +15,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Deploy files and prepare directory
+      # Step 2: Add Host Key to Known Hosts
+      - name: Add Host Key
+        run: ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+
+      # Step 3: Deploy files to the server and prepare directory
       - name: Deploy Files and Prepare Directory
         uses: easingthemes/ssh-deploy@v5.1.0
         with:
@@ -28,3 +32,7 @@ jobs:
             sudo chown -R ubuntu:ubuntu /var/www/html
           SCRIPT_AFTER: |
             mv /var/www/html/.env.example /var/www/html/.env
+
+      # Step 4: Validate Deployment
+      - name: Validate Deployment
+        run: ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.REMOTE_HOST }} "ls -la /var/www/html"
