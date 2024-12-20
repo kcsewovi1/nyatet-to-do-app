@@ -37,7 +37,4 @@ jobs:
           SCRIPT_AFTER: |
             mv /var/www/html/.env.example /var/www/html/.env
 
-      - name: Validate Deployment
-        run: ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.REMOTE_HOST }} "ls -la /var/www/html"
-
-    
+      
