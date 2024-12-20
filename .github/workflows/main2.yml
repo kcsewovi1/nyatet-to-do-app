@@ -1,0 +1,38 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main   # Trigger workflow only on pushes to the 'main' branch
+  workflow_dispatch:   # Allow manual triggering of the workflow
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use the GitHub runner
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Deploy files to the server using Appleboy's SSH action
+      - name: Deploy Files to Server
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./"   # Directory to copy from (root of the repo by default)
+          target: "/var/www/html"   # Directory on the server
+
+      # Step 3: Run commands on the server using Appleboy's SSH action
+      - name: Post-Deployment Commands
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo chown -R ubuntu:ubuntu /var/www/html
+            sudo chmod -R 755 /var/www/html
+            echo "Deployment complete!"
