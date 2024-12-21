@@ -34,7 +34,7 @@ jobs:
           TARGET: "/var/www/html"
           SCRIPT_BEFORE: |
             ls
-            sudo chown -R root:root /var/www/html
+            sudo chown -R ubuntu:ubuntu /var/www/html
           SCRIPT_AFTER: |
             mv /var/www/html/.env.example /var/www/html/.env
 
