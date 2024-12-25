@@ -59,6 +59,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/html/my-laravel-app
-            php artisan migrate --force
-            php artisan optimize
+            sudo apt install php php-cli php-mbstring php-xml php-bcmath php-curl unzip -y
             echo "Deployment complete!"
