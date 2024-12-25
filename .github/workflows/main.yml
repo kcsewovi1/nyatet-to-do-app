@@ -1,41 +1,64 @@
-name: Deploy to Server
+name: Deploy Laravel Application to Production Server
 
 on:
   push:
     branches:
-      - main  # Trigger this workflow only on pushes to the 'main' branch
-  workflow_dispatch:  # Allow manual triggering of this workflow
+      - main  # Trigger the workflow on pushes to the 'main' branch
+  workflow_dispatch:  # Allow manual triggering of the workflow
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # GitHub runner (virtual machine)
+    runs-on: ubuntu-latest  # Use a GitHub-hosted runner
 
     steps:
-      # Step 1: Checkout the repository code
+      # Step 1: Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Add Host Key to Known Hosts
-      - name: Set Up SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 755 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-
-      # Step 3: Deploy files to the server and prepare directory
-      - name: Deploy Files and Prepare Directory
-        uses: easingthemes/ssh-deploy@main
+      # Step 2: Setup PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
+          php-version: '8.4'  # Use the latest stable PHP version
+          tools: composer  # Install Composer
+
+      # Step 3: Install Composer Dependencies
+      - name: Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
+
+      # Step 4: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20  # Use the latest stable Node.js version
+
+      # Step 5: Install NPM Dependencies
+      - name: Install NPM Dependencies
+        run: npm install
+
+      # Step 6: Build NPM Assets
+      - name: Build NPM Assets
+        run: npm run build
+
+      # Step 7: Deploy files to the server
+      - name: Deploy Files to Server
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: "."
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: "/var/www/html/letmeseeifitwillwork"
-          SCRIPT_BEFORE: |
-            ls
-            sudo chown -R ubuntu:ubuntu /var/www/html
-          SCRIPT_AFTER: |
-            mv /var/www/html/.env.example /var/www/html/.env
+          SOURCE: "."  # Source directory
+          TARGET: "/var/www/html/my-laravel-app"  # Deployment directory on the server
 
-      
+      # Step 8: Run Artisan Commands on the Server
+      - name: Run Remote Artisan Commands
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/my-laravel-app
+            php artisan migrate --force
+            php artisan optimize
+            echo "Deployment complete!"
