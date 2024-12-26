@@ -24,7 +24,7 @@ jobs:
 
       # Step 3: Install Composer Dependencies
       - name: Install Composer Dependencies
-        run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
+        run: composer install --optimize-autoloader --dev --no-progress --no-interaction --prefer-dist
 
       # Step 4: Setup Node.js
       - name: Setup Node.js
